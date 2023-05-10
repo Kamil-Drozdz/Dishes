@@ -3,7 +3,19 @@ import { Formik, Form, Field } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
-import { TextField, Select, MenuItem, InputLabel, FormControl, Button, Box, useMediaQuery } from '@material-ui/core';
+
+import {
+	TextField,
+	Select,
+	MenuItem,
+	InputLabel,
+	FormControl,
+	Button,
+	Box,
+	useMediaQuery,
+	Typography,
+	InputAdornment,
+} from '@material-ui/core';
 
 interface FormValues {
 	id: number;
@@ -19,6 +31,9 @@ interface FormValues {
 const DishForm: React.FC = () => {
 	const [selectedType, setSelectedType] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [successMessage, setSuccessMessage] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
+
 	const isLargeScreen = useMediaQuery('(min-width:800px)');
 	const initialValues: FormValues = {
 		id: 0,
@@ -32,7 +47,7 @@ const DishForm: React.FC = () => {
 	};
 
 	const validationSchema = Yup.object().shape({
-		name: Yup.string().required(),
+		name: Yup.string().required().min(3),
 		preparation_time: Yup.string().required(),
 		type: Yup.string().required(),
 		no_of_slices: Yup.number()
@@ -76,21 +91,21 @@ const DishForm: React.FC = () => {
 				delete submittedValues.slices_of_bread;
 			}
 			submittedValues.id = Math.floor(Math.random() * 1000);
+			const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}`, submittedValues, {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			if (response.status === 200) {
+				setSuccessMessage('Dish submitted successfully!');
+				setErrorMessage('');
+			}
 
-			console.log(submittedValues);
-			const response = await axios.post(
-				'https://umzzcc503l.execute-api.us-west-2.amazonaws.com/dishes/',
-				submittedValues,
-				{
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			);
-			console.log(response);
 			resetForm();
+			setSelectedType('');
 		} catch (error) {
 			console.error(error);
+			setErrorMessage('There was an error submitting the dish. Please try again.');
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -106,6 +121,7 @@ const DishForm: React.FC = () => {
 				marginTop: '10%',
 				margin: 'auto',
 				width: isLargeScreen ? '40%' : '90%',
+				boxShadow: 2,
 			}}>
 			<Formik initialValues={initialValues} onSubmit={handleFormSubmit} validationSchema={validationSchema}>
 				{({ values, handleChange, touched, isValid }) => (
@@ -115,7 +131,7 @@ const DishForm: React.FC = () => {
 						</Box>
 						<Box mb={2}>
 							<Field
-								type='time'
+								type={touched.preparation_time ? 'time' : 'text'}
 								as={TextField}
 								name='preparation_time'
 								label='Preparation time'
@@ -164,6 +180,14 @@ const DishForm: React.FC = () => {
 										type='number'
 										name='diameter'
 										label='Diameter (20-80)'
+										inputProps={{
+											step: 0.01,
+											min: 0,
+											max: 80,
+										}}
+										InputProps={{
+											endAdornment: <InputAdornment position='end'>cm</InputAdornment>,
+										}}
 										variant='outlined'
 										fullWidth
 									/>
@@ -180,7 +204,10 @@ const DishForm: React.FC = () => {
 										values.spiciness_scale ? `Spiciness scale ${values.spiciness_scale}` : 'Spiciness scale (1-10)'
 									}
 									variant='outlined'
-									InputProps={{ inputProps: { min: 0, max: 10 } }}
+									inputProps={{
+										min: 0,
+										max: 10,
+									}}
 									fullWidth
 								/>
 							</Box>
@@ -197,9 +224,21 @@ const DishForm: React.FC = () => {
 								/>
 							</Box>
 						)}
-						<Button type='submit' variant='contained' color='primary' disabled={!isValid || !touched.type}>
+						<Button type='submit' variant='contained' color='primary' fullWidth disabled={!isValid || !touched.type}>
 							{isSubmitting ? <PulseLoader color='white' size={21} /> : 'Submit'}
 						</Button>
+						<Box mt={2} textAlign='center'>
+							{successMessage && (
+								<Typography variant='subtitle2' style={{ color: 'green' }}>
+									{successMessage}
+								</Typography>
+							)}
+							{errorMessage && (
+								<Typography variant='subtitle2' style={{ color: 'red' }}>
+									{errorMessage}
+								</Typography>
+							)}
+						</Box>
 					</Form>
 				)}
 			</Formik>
