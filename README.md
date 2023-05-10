@@ -1,5 +1,5 @@
 <h4>
-    <a href="https://https://dishes-project.vercel.app//">View Demo</a>
+    <a href="https://dishes-project.vercel.app//">View Demo</a>
   <span> · </span>
     <a href="https://github.com/Kamil-Drozdz/Dishes/issues">Report Bug</a>
   <span> · </span>
