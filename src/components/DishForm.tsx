@@ -10,10 +10,10 @@ interface FormValues {
 	name: string;
 	preparation_time: string;
 	type: string;
-	no_of_slices: number | '';
-	diameter: number | '';
-	spiciness_scale: number | '';
-	slices_of_bread: number | '';
+	no_of_slices?: number | '';
+	diameter?: number | '';
+	spiciness_scale?: number | '';
+	slices_of_bread?: number | '';
 }
 
 const DishForm: React.FC = () => {
@@ -21,7 +21,7 @@ const DishForm: React.FC = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const isLargeScreen = useMediaQuery('(min-width:800px)');
 	const initialValues: FormValues = {
-		id: '',
+		id: 0,
 		name: '',
 		preparation_time: '',
 		type: '',
@@ -133,7 +133,7 @@ const DishForm: React.FC = () => {
 									name='type'
 									label='Dish type'
 									value={values.type}
-									onChange={e => {
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 										handleChange(e);
 										setSelectedType(e.target.value);
 									}}>
