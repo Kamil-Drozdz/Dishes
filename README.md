@@ -13,6 +13,7 @@
 <!-- About the Project -->
 ## :star2: About the recruitment project
 Dish Form is a web application built with React +Vite  that allows users to add various types of dishes to a database. The application uses Formik for form handling, Yup for data validation, and axios for API request handling.
+To style the components, Material-UI was used.
 
 Features
 Add dishes, such as pizza, soup, and sandwich, with specified parameters
